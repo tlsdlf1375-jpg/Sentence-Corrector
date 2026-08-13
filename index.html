@@ -311,15 +311,17 @@
         aiCheckBtn.disabled = true;
 
         try {
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'correct',
-                    korSentence: korSentence.value.trim(),
-                    engSentence: engSentence.value.trim()
-                })
-            });
-
+ const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8', // CORS 우회를 위한 text/plain 처리
+            },
+            body: JSON.stringify({
+                action: 'correct',
+                korSentence: korSentence.value.trim(),
+                engSentence: engSentence.value.trim()
+            })
+        });
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -381,20 +383,23 @@
         completeBtn.disabled = true;
 
         try {
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'save',
-                    grade: grade.value,
-                    classNum: classNum.value,
-                    studentNum: studentNum.value,
-                    studentName: studentName.value,
-                    korSentence: korSentence.value.trim(),
-                    engSentence: engSentence.value.trim(),
-                    aiFeedback: currentAiFeedback,
-                    finalSentence: finalSentence.value.trim()
-                })
-            });
+const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify({
+                action: 'save',
+                grade: grade.value,
+                classNum: classNum.value,
+                studentNum: studentNum.value,
+                studentName: studentName.value,
+                korSentence: korSentence.value.trim(),
+                engSentence: engSentence.value.trim(),
+                aiFeedback: currentAiFeedback,
+                finalSentence: finalSentence.value.trim()
+            })
+        });
 
             const data = await response.json();
             if (data.status === 'success') {
