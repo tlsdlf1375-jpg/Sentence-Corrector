@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>영어 문장 첨삭기 by 신일쌤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #50E3C2;
+            --warning-color: #FF6B6B;
+            --info-color: #FFF3CD;
+            --bg-color: #F4F7F6;
+            --box-bg: #FFFFFF;
+            --text-main: #333333;
+            --border-color: #E1E8ED;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2vw;
+            display: flex;
+            justify-content: center;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .container {
+            background-color: var(--box-bg);
+            max-width: 900px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 5%;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            word-break: keep-all;
+        }
+
+        h1 span { font-size: 2rem; }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 20px;
+            word-break: keep-all;
+        }
+
+        .info-box {
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        .description { background-color: #E8F4FD; border-left: 5px solid var(--primary-color); }
+        .notice { background-color: var(--info-color); border-left: 5px solid #FFC107; }
+        .warning { background-color: #FFEDED; border-left: 5px solid var(--warning-color); color: #D8000C; font-weight: 500; margin-bottom: 30px; }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #FAFAFA;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        }
+
+        .input-group { margin-bottom: 25px; }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        button:active { 
+            transform: scale(0.96);
+            filter: brightness(0.9);
+        }
+
+        .btn-ai { background-color: var(--primary-color); color: white; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3); }
+        .btn-submit { background-color: var(--secondary-color); color: #222; box-shadow: 0 4px 15px rgba(80, 227, 194, 0.3); }
+        .btn-restart { background-color: #95A5A6; color: white; display: none; }
+
+        #resultSection, #finalSection {
+            display: none;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px dashed var(--border-color);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 500px;
+            border-collapse: collapse;
+            background-color: white;
+            font-size: 1rem;
+        }
+
+        th, td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            line-height: 1.5;
+        }
+
+        th { background-color: #F8F9FA; font-weight: 700; color: var(--primary-color); white-space: nowrap; }
+        .err-text { color: var(--warning-color); text-decoration: line-through; font-weight: 500; }
+        .fix-text { color: #27AE60; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><span>👨‍🏫</span> 영어 문장 첨삭기 by 신일쌤</h1>
+        <div class="subtitle">직접 작성한 영어 문장, AI가 오류를 발견해드려요 ✨</div>
+    </header>
+
+    <div class="info-box description">
+        💡 <b>설명:</b> 직접 작성한 영어 문장과 원래 의도했던 해석을 작성하여 입력하면, AI가 틀리거나 어색한 부분을 찾아줍니다.
+    </div>
+    
+    <div class="info-box notice">
+        📌 <b>유의사항:</b> 모든 질문과 답변은 실시간으로 기록됩니다. 수업 도중 학습의 근거로 활용되니, 반드시 본인의 학반번호, 이름을 정확히 기재하세요.
+    </div>
+
+    <div class="info-box warning">
+        🚨 <b>주의사항:</b> 이 웹앱을 제외한 기타 생성형 AI(Chat GPT, Gemini, Claude 등) 사용은 엄격히 제한됩니다!!
+    </div>
+
+    <div class="section-title">👤 내 정보 입력</div>
+    <div class="student-info">
+        <select id="grade">
+            <option value="">학년</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+        </select>
+        <select id="classNum">
+            <option value="">반</option>
+            <script>
+                for(let i=1; i<=8; i++) document.write(`<option value="${i}">${i}반</option>`);
+            </script>
+        </select>
+        <select id="studentNum">
+            <option value="">번호</option>
+            <script>
+                for(let i=1; i<=32; i++) document.write(`<option value="${i}">${i}번</option>`);
+            </script>
+        </select>
+        <input type="text" id="studentName" placeholder="이름 입력">
+    </div>
+
+    <div class="section-title">✍️ 문장 작성하기</div>
+    <div class="input-group">
+        <label for="korSentence">내가 표현하려고 했던 문장 (한글 문장)</label>
+        <textarea id="korSentence" placeholder="예: 나는 어제 친구들과 함께 공원에 갔다."></textarea>
+    </div>
+    <div class="input-group">
+        <label for="engSentence">내가 직접 작성한 영어 문장</label>
+        <textarea id="engSentence" placeholder="예: I go to park with friends yesterday."></textarea>
+    </div>
+
+    <button class="btn-ai" id="aiCheckBtn">🤖 첨삭해주세요</button>
+
+    <div id="resultSection">
+        <div class="section-title">🔍 AI 첨삭 결과</div>
+        <div class="table-responsive">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>기존 표현 (어색한 부분)</th>
+                        <th>틀리거나 어색한 이유</th>
+                        <th>수정 표현</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="finalSection">
+        <div class="input-group">
+            <label for="finalSentence">📝 첨삭 내용을 바탕으로 수정한 문장</label>
+            <textarea id="finalSentence" placeholder="AI의 피드백을 참고하여 올바른 문장으로 다시 작성해보세요."></textarea>
+        </div>
+        <button class="btn-submit" id="completeBtn">✅ 완료 (제출하기)</button>
+        <button class="btn-restart" id="restartBtn">🔄 다시 하기 (새 문장 작성)</button>
+    </div>
+</div>
+
+<script>
+    // ⚠️ 구글 앱스 스크립트 웹 앱 URL을 지정하세요.
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzT7m6bj8b6r6uqm4jI2aX4HQo0kJgazl2a4zu5OVAtFKfYst-5-hyNOA4Qbwc4DQpu/exec'; 
+
+    let currentAiFeedback = []; // AI 결과를 저장할 변수
+
+    // HTML 요소 선택
+    const aiCheckBtn = document.getElementById('aiCheckBtn');
+    const resultSection = document.getElementById('resultSection');
+    const finalSection = document.getElementById('finalSection');
+    const completeBtn = document.getElementById('completeBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const resultBody = document.getElementById('resultBody');
+
+    const grade = document.getElementById('grade');
+    const classNum = document.getElementById('classNum');
+    const studentNum = document.getElementById('studentNum');
+    const studentName = document.getElementById('studentName');
+    const korSentence = document.getElementById('korSentence');
+    const engSentence = document.getElementById('engSentence');
+    const finalSentence = document.getElementById('finalSentence');
+
+    // 1. "첨삭해주세요" 버튼 클릭 로직
+    aiCheckBtn.addEventListener('click', async () => {
+        if(!grade.value || !classNum.value || !studentNum.value || !studentName.value) {
+            alert('학생 정보를 모두 선택/입력해주세요!');
+            return;
+        }
+        if(!korSentence.value.trim() || !engSentence.value.trim()) {
+            alert('한글 문장과 영어 문장을 모두 작성해주세요!');
+            return;
+        }
+
+        aiCheckBtn.innerText = '⏳ AI가 분석 중입니다...';
+        aiCheckBtn.disabled = true;
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'correct',
+                    korSentence: korSentence.value.trim(),
+                    engSentence: engSentence.value.trim()
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                currentAiFeedback = data.result;
+                resultBody.innerHTML = '';
+                
+                // 틀린 부분이 존재하는 경우
+                if(currentAiFeedback && currentAiFeedback.length > 0) {
+                    currentAiFeedback.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="err-text">${item.err}</td>
+                            <td>${item.reason}</td>
+                            <td class="fix-text">${item.fix}</td>
+                        `;
+                        resultBody.appendChild(tr);
+                    });
+                    finalSentence.value = ''; // 기존 입력 초기화
+                } 
+                // 틀린 부분이 없는 경우
+                else {
+                    resultBody.innerHTML = `
+                        <tr>
+                            <td colspan="3" style="text-align:center; padding: 30px; font-weight: bold; color: #27AE60; font-size: 1.1rem; line-height: 1.6;">
+                                🎉 틀린 부분 없음! 완벽해요.<br>
+                                <span style="font-size: 0.95rem; color: #555; font-weight: normal;">
+                                    최종 문장에는 기존 문장을 그대로 써서 제출하세요.
+                                </span>
+                            </td>
+                        </tr>`;
+                    
+                    // 기존 작성 영어 문장 자동 입력
+                    finalSentence.value = engSentence.value.trim();
+                }
+
+                resultSection.style.display = 'block';
+                finalSection.style.display = 'block';
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                alert('AI 분석 중 오류가 발생했습니다: ' + data.message);
+            }
+        } catch (err) {
+            alert('서버통신 오류가 발생했습니다.');
+            console.error(err);
+        } finally {
+            aiCheckBtn.innerText = '🤖 첨삭해주세요';
+            aiCheckBtn.disabled = false;
+        }
+    });
+
+    // 2. "완료(제출하기)" 버튼 클릭 로직
+    completeBtn.addEventListener('click', async () => {
+        if(!finalSentence.value.trim()) {
+            alert('수정한 문장을 작성해주세요!');
+            return;
+        }
+
+        completeBtn.innerText = '전송 중...';
+        completeBtn.disabled = true;
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'save',
+                    grade: grade.value,
+                    classNum: classNum.value,
+                    studentNum: studentNum.value,
+                    studentName: studentName.value,
+                    korSentence: korSentence.value.trim(),
+                    engSentence: engSentence.value.trim(),
+                    aiFeedback: currentAiFeedback,
+                    finalSentence: finalSentence.value.trim()
+                })
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                alert('🎉 구글 스프레드시트로 데이터가 성공적으로 전송되었습니다!');
+                completeBtn.style.display = 'none'; 
+                restartBtn.style.display = 'flex';  
+            } else {
+                alert('저장 중 오류가 발생했습니다.');
+            }
+        } catch (err) {
+            alert('서버통신 오류가 발생했습니다.');
+            console.error(err);
+        } finally {
+            completeBtn.innerText = '✅ 완료 (제출하기)';
+            completeBtn.disabled = false;
+        }
+    });
+
+    // 3. "다시 하기" 버튼 클릭 로직
+    restartBtn.addEventListener('click', () => {
+        korSentence.value = '';
+        engSentence.value = '';
+        finalSentence.value = '';
+        
+        resultSection.style.display = 'none';
+        finalSection.style.display = 'none';
+        
+        restartBtn.style.display = 'none';
+        completeBtn.style.display = 'flex';
+        
+        korSentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => korSentence.focus(), 500);
+    });
+</script>
+
+</body>
+</html>
